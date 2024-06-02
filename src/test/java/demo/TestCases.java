@@ -1,264 +1,258 @@
 package demo;
 
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 
 public class TestCases extends BaseTest{
 
-    @Test    
-    public void testCase01() throws InterruptedException{
+   @Test
+  public void testCase01() throws InterruptedException{
 
-        try{
+   
 
-        driver.get("https://www.flipkart.com/");
+    driver.get("https://www.youtube.com/");
 
-        WebElement flipkartSearch=driver.findElement(By.xpath("//input[@class='Pke_EE']"));
-        flipkartSearch.click();
-        flipkartSearch.sendKeys("Washing Machine");
-        
-        Thread.sleep(3000);
+try{
 
-        WebElement searchButton=driver.findElement(By.xpath("//button[@class='_2iLD__']"));
-        searchButton.click();
-        Thread.sleep(3000);
+    String expectedUrl="https://www.youtube.com/";
+    String currentUrl=driver.getCurrentUrl();
 
-        WebElement popularity=driver.findElement(By.xpath("//div[text()='Popularity']"));
-        popularity.click();
+    Assert.assertEquals(expectedUrl, currentUrl,"The expected url is not matching.");
 
-        Thread.sleep(3000);
+    WebElement aboutLink=driver.findElement(By.xpath("//a[text()='About']"));
 
-        List<WebElement> productRating=driver.findElements(By.xpath("//span[@class='Y1HWO0']/div"));
+    JavascriptExecutor jse=(JavascriptExecutor)driver;
+    jse.executeScript("arguments[0].scrollIntoView();",aboutLink);
 
-        int count=0;
-        for(int i=0;i<productRating.size();i++)
-        {
-            String productValue=productRating.get(i).getText();
-            //System.out.println(productValue);
-            //int integerProductValue=Integer.parseInt(productValue);
-           float integerProductValue=Float.parseFloat(productValue);
+    aboutLink.click();
 
-            if(integerProductValue<=4.0)
-            {
-               count++;
-            }
-        }
+    WebDriverWait wait=new WebDriverWait(driver, Duration.ofSeconds(3l));
+    wait.until(ExpectedConditions.urlToBe("https://about.youtube/"));
 
-    }
-    catch(Exception e)
-    {
-        System.out.println(e.getStackTrace());
-        Assert.assertFalse(false,"The Washing Machine search testcase is failed.");
-    }
+    jse.executeScript("arguments[0].scrollIntoView();",driver.findElement(By.xpath("(//p[@class='lb-font-display-3 lb-font-color-text-primary'])[1]")));
 
-      Assert.assertTrue(true,"The Washing Machine search testcase is passed.");
+    WebElement aboutYoutubeText=driver.findElement(By.xpath("//section[@class='ytabout__content']/h1"));
 
-    }
+    String youtubeText=aboutYoutubeText.getText().trim();
+
+    WebElement youTubeMessage=driver.findElement(By.xpath("(//p[@class='lb-font-display-3 lb-font-color-text-primary'])[1]"));
+    String updatedYoutubeMessage=youTubeMessage.getText().trim();
+
+    System.out.println(youtubeText);
+    System.out.println(updatedYoutubeMessage);
+
+
+}
+
+  catch(Exception e)
+  {
+    System.out.println(e.getMessage());
+  }
+
+    
+  }
 
 
     @Test
     public void testCase02() throws InterruptedException{
 
-        try{
+      driver.get("https://www.youtube.com/");
 
-        WebElement productSearch=driver.findElement(By.xpath("//input[@class='zDPmFV']"));
-        productSearch.click();
-        Thread.sleep(2000);
-        Actions action=new Actions(driver);
-        action.keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL);
-        action.perform();
-        action.sendKeys(Keys.DELETE);
-        action.perform();
-      //  productSearch.clear();
-        Thread.sleep(3000);
-        productSearch.sendKeys("iPhone");
-        Thread.sleep(3000);
+      try{
 
-        WebElement searchKey=driver.findElement(By.xpath("//button[@class='MJG8Up']"));
-        searchKey.click();
-        Thread.sleep(3000);
+      WebElement movies=driver.findElement(By.xpath("//yt-formatted-string[text()='Movies']"));
 
-        List<WebElement> listOfProductsDiscounts=driver.findElements(By.xpath("//div[@class='tUxRFH']"));
+      JavascriptExecutor jse=(JavascriptExecutor)driver;
+      jse.executeScript("arguments[0].scrollIntoView();", movies);
 
-        for(WebElement parentElement : listOfProductsDiscounts)
+      movies.click();
+
+      WebDriverWait wait=new WebDriverWait(driver, Duration.ofSeconds(3l));
+      wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[text()='Movies']")));
+
+
+     
+      while(true){ 
+        // System.out.println("1");
+        WebElement forwardButton=driver.findElement(By.xpath("(//ytd-button-renderer[@class='style-scope yt-horizontal-list-renderer arrow'])[2]//button"));
+      //  System.out.println(forwardButton);
+      //  System.out.println(forwardButton.isDisplayed());
+        if(forwardButton.isDisplayed())
         {
-            WebElement productDiscount=parentElement.findElement(By.xpath(".//div[@class='UkUFwK']/span"));
-            String productDiscountText=productDiscount.getText();
-            String replace="% off";
-            String current="";
-            String exactProductDiscount=productDiscountText.replace(replace, current);
-            int productDiscountValue=Integer.parseInt(exactProductDiscount);
-            if(productDiscountValue>17)
-            {
-                WebElement productTitle=parentElement.findElement(By.xpath(".//div[@class='KzDlHZ']"));
-                System.out.println("Product title:-" + productTitle.getText() + " and discount percentage:-" + productDiscountValue);
-
-            }
+         // System.out.println("2");
+          forwardButton.click();
         }
+        else{
+          break;
+        }
+
+      }
+
+      WebElement movieGradeA=driver.findElement(By.xpath("(//p[@class='style-scope ytd-badge-supported-renderer'])[32]"));
+
+     SoftAssert obj=new SoftAssert();
+     String movieGradeFound=movieGradeA.getText();
+     String expectedMovieGrade="A";
+
+     obj.assertEquals(movieGradeFound, expectedMovieGrade);
+
+     WebElement movieGenre=driver.findElement(By.xpath("(//span[@class='grid-movie-renderer-metadata style-scope ytd-grid-movie-renderer'])[16]"));
+
+     boolean status=false;
+
+     if(movieGenre.getText().contains("Comedy") || movieGenre.getText().contains("Animation"))
+     {
+      status=true;
+     }
+
+     obj.assertTrue(status);
+
+     obj.assertAll();
 
     }
 
     catch(Exception e)
     {
-      System.out.println(e.getStackTrace());
-      Assert.assertFalse(false,"The iPhone search testcase is failed.");
+      System.out.println(e.getMessage());
     }
 
-    Assert.assertTrue(true,"The iPhone search testcase is passed.");
 
+      
     }
 
-    @SuppressWarnings("unlikely-arg-type")
+   
     @Test
     public void testCase03() throws InterruptedException{
 
-        try{
+      driver.get("https://www.youtube.com/");
 
-        WebElement productSearch=driver.findElement(By.xpath("//input[@class='zDPmFV']"));
-        productSearch.click();
-        Thread.sleep(2000);
-        Actions action=new Actions(driver);
-        action.keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL);
-        action.perform();
-        action.sendKeys(Keys.DELETE);
-        action.perform();
-      //  productSearch.clear();
-        Thread.sleep(3000);
-        productSearch.sendKeys("Coffee Mug");
-        Thread.sleep(3000);
 
-        WebElement searchKey=driver.findElement(By.xpath("//button[@class='MJG8Up']"));
-        searchKey.click();
-        Thread.sleep(3000);
+      try{
+
+      WebElement music=driver.findElement(By.xpath("(//yt-icon-shape[@class='style-scope yt-icon'])[26]"));
+      music.click();
+
+      WebDriverWait wait=new WebDriverWait(driver, Duration.ofSeconds(3l));
+      wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//button[@aria-label='Next'])[1]")));
+      
+
+
+      JavascriptExecutor jse=(JavascriptExecutor)driver;
+      jse.executeScript("arguments[0].scrollIntoView();", driver.findElement(By.xpath("(//div[@class='style-scope ytd-shelf-renderer'])[2]//span")));
+
+      while(true){ 
+
+        WebElement nextButton=driver.findElement(By.xpath("(//button[@aria-label='Next'])[1]"));
+        if(nextButton.isDisplayed())
+        {
+          nextButton.click();
+        }
+        else{
+          break;
+        }
+        
+      }
+
+      Thread.sleep(3000);
+
+      WebElement filmsTitle=driver.findElement(By.xpath("(//h3[@class='style-scope ytd-compact-station-renderer'])[11]"));
+
+      System.out.println(filmsTitle.getText().trim());
+
+      WebElement tracksInput=driver.findElement(By.xpath("(//p[@id='video-count-text'])[11]"));
+
+      String updatedTracksInput=tracksInput.getText().trim();
+      String current=" tracks";
+      String replace="";
+      String neededTracksInput=updatedTracksInput.replace(current, replace);
+
+      int tracksCount=Integer.parseInt(neededTracksInput);
+      boolean status=false;
+      if(tracksCount<=50)
+      {
+         status=true;
+      }
+
+      System.out.println(status);
+      SoftAssert obj=new SoftAssert();
+      obj.assertTrue(status,"The tracks count is not equal to and less than 50.");
+      obj.assertAll();
+
+    }
+
+    catch(Exception e)
+    {
+       System.out.println(e.getMessage());
+    }
+
+      
+  }
+
+
+     @Test
+     public void testCase04() throws InterruptedException{
+
+      try{
+ 
+       driver.get("https://www.youtube.com/");
+
+       WebElement news=driver.findElement(By.xpath("(//yt-icon-shape[@class='style-scope yt-icon'])[30]"));
+       news.click();
+
+       WebDriverWait wait=new WebDriverWait(driver, Duration.ofSeconds(6l));
+       wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Latest news posts']")));
 
        JavascriptExecutor jse=(JavascriptExecutor)driver;
-        
-      // WebElement oneStar=driver.findElement(By.xpath("//div[text()='1★ & above']"));
-      //  System.out.println(oneStar.getText());
-        jse.executeScript("window.scrollBy(0,350)","");
+       jse.executeScript("window.scrollBy(0,300)", "");
 
-        Thread.sleep(2000);
+       List<WebElement> listOfNewsPosts=driver.findElements(By.xpath("//ytd-post-renderer[@class='style-scope ytd-rich-item-renderer']"));
 
-        //WebElement fourStarCheckbox=driver.findElement(By.xpath("//div[text()='4★ & above']//parent::label//div[@class='XqNaEv']"));
-       // WebElement fourStarCheckbox=driver.findElement(By.xpath("(//input[@class='vn9L2C'])[2]"));
-       WebElement fourStarCheckbox=driver.findElement(By.cssSelector("#container > div > div.nt6sNV.JxFEK3._48O0EI > div.DOjaWF.YJG4Cf > div.DOjaWF.gdgoEp.col-2-12 > div > div > div > section:nth-child(6) > div.SDsN9S > div > div:nth-child(1) > div > label > div.XqNaEv"));
-       fourStarCheckbox.click();
-
-        Thread.sleep(3000);
-
-        List<WebElement> reviews=driver.findElements(By.xpath("//span[@class='Wphh3N']"));
-
-        int[] reviews_2=new int[reviews.size()];
-        int index=0;
-
-        
-        for(WebElement element : reviews)
-        {
-
-          //  System.out.println(element.getText());
-            
-           String element_2=element.getText();
-            // System.out.println(element_2);
-            if(element_2.contains(","))
-            {
-                String current=",";
-                String replace="";
-                String updated=element_2.replace(current, replace);
-                element_2=updated;
-            }
-          //  System.out.println(element_2);
-             int endIndex=element_2.length()-1;
-            // System.out.println(endIndex);
-             String subStr=element_2.substring(1, endIndex);
-             int reviewCountValue=Integer.parseInt(subStr);
-             reviews_2[index]=reviewCountValue;
-             index++;
-
-        }
-
-    
-   
-
-          Arrays.sort(reviews_2);
-
-          int updatedArray[]=new int[5];
-          int c=0,index2=0;
-
-          for(int i=reviews_2.length-1;i>=0;i--)
+         int sum=0;
+         int count=0;
+         for(WebElement parentElement : listOfNewsPosts){
+          if(count==3)
           {
-               if(c==5)
-               {
-                break;
-               }
-              updatedArray[index2]=reviews_2[i];
-              index2++;
-              c++;
-
+            break;
           }
+         WebElement newsPostsTitle=parentElement.findElement(By.xpath(".//a[@id='author-text']//span"));
+         System.out.println("News posts title:- "+newsPostsTitle.getText());
 
-          //System.out.println(updatedArray[3]+ " " +updatedArray[4]);
+         WebElement newsPostsBody=parentElement.findElement(By.xpath(".//yt-formatted-string[@id='home-content-text']"));
+         System.out.println("News post body:- "+newsPostsBody.getText());
 
+         WebElement likes=parentElement.findElement(By.xpath(".//span[@id='vote-count-middle']"));
+        // System.out.println(likes.getAttribute("aria-label"));
+         String likes_2=likes.getText();
+         if(likes_2.length()!=0)
+         {
+           String updatedLikes=likes_2.trim();
+           int likesCount=Integer.parseInt(updatedLikes);
+           //System.out.println(likesCount);
+           sum=sum+likesCount;
+         }
+         count++;
 
+       }
+       System.out.println("The sum of likes count of 1st 3 latest news posts:- "+sum);
 
-          List<WebElement> listOfItems=driver.findElements(By.xpath("//div[@class='slAVV4']"));
+      }
 
+      catch(Exception e)
+      {
+        System.out.println(e.getMessage());
+      }
 
-          for(WebElement parentElement : listOfItems)
-          {
-
-          //  System.out.println(parentElement.getText());
-            WebElement reviewsCount=parentElement.findElement(By.xpath(".//span[@class='Wphh3N']"));
-      
-            String element_2=reviewsCount.getText();
-
-            if(element_2.contains(","))
-            {
-                String current=",";
-                String replace="";
-                String updated=element_2.replace(current, replace);
-                element_2=updated;
-            }
-
-             String subStr=element_2.substring(1, element_2.length()-1);
-
-            
-           int reviewCountValue=Integer.parseInt(subStr);
-           //System.out.println("list element" + reviewCountValue);
-           //System.out.println(updatedArray[0] +", " + updatedArray[1] +", "+ updatedArray[2] + ", "+updatedArray[3]+ ", "+ updatedArray[4]);
-           boolean isElement=IntStream.of(updatedArray).anyMatch(x -> x == reviewCountValue);
-          //  System.out.println(isElement);
-            if(isElement==true)
-            {
-                WebElement itemTitle=parentElement.findElement(By.xpath(".//a[@class='wjcEIp']"));
-                WebElement itemImage=parentElement.findElement(By.xpath(".//img[@class='DByuf4']"));
-                System.out.println("item Title:- " + itemTitle.getText() + "itemImageUrl:- " + itemImage.getAttribute("src"));
-   
-            }
-          }
-
-        }
-
-          catch(Exception e)
-          {
-             System.out.println(e.getStackTrace());
-             Assert.assertFalse(false,"The Coffee Mug search testcase is failed.");
-          }
-
-          Assert.assertTrue(true,"The Coffee Mug search testcase is passed.");
-
-        
-        
      }
-
     
     
 

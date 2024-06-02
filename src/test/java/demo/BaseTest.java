@@ -36,7 +36,7 @@ public class BaseTest{
 
         // Set browser to maximize and wait
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30l));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5l));
     }
 
     // @BeforeTest

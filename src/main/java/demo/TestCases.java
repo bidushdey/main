@@ -28,11 +28,9 @@ public class TestCases {
     }
 
     
-<<<<<<< HEAD
-    public void testCase01(){
-=======
-    public  void testCase01() throws InterruptedException{
->>>>>>> 3453d957e1d2c9d2b42f518bff0f7d6b7f192e9d
+
+    public void testCase01() throws InterruptedException{
+
         System.out.println("Start Test case: testCase01");
 
         driver.get("https://docs.google.com/forms/d/e/1FAIpQLSep9LTMntH5YqIXa5nkiPKSs283kdwitBBhXWyZdAS-e4CxBQ/viewform");
