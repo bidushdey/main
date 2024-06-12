@@ -9,6 +9,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -40,10 +41,18 @@ public class BaseTest{
     }
 
     // @BeforeTest
+    
     // public void openUrl()
     // {
     //    driver.get("https://www.flipkart.com/");
     // }
+
+    @BeforeMethod
+    public void openUrl()
+    {
+        System.out.println("Opening the url.");
+        driver.get("https://www.scrapethissite.com/pages/");
+    }
 
     @AfterSuite
     public void closeBrowser()

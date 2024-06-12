@@ -1,267 +1,286 @@
 package demo;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class TestCases extends BaseTest{
-
-    @Test    
-    public void testCase01() throws InterruptedException{
-
-        try{
-
-        driver.get("https://www.flipkart.com/");
-
-        WebElement flipkartSearch=driver.findElement(By.xpath("//input[@class='Pke_EE']"));
-        flipkartSearch.click();
-        flipkartSearch.sendKeys("Washing Machine");
-        
-        Thread.sleep(3000);
-
-        WebElement searchButton=driver.findElement(By.xpath("//button[@class='_2iLD__']"));
-        searchButton.click();
-        Thread.sleep(3000);
-
-        WebElement popularity=driver.findElement(By.xpath("//div[text()='Popularity']"));
-        popularity.click();
-
-        Thread.sleep(3000);
-
-        List<WebElement> productRating=driver.findElements(By.xpath("//span[@class='Y1HWO0']/div"));
-
-        int count=0;
-        for(int i=0;i<productRating.size();i++)
-        {
-            String productValue=productRating.get(i).getText();
-            //System.out.println(productValue);
-            //int integerProductValue=Integer.parseInt(productValue);
-           float integerProductValue=Float.parseFloat(productValue);
-
-            if(integerProductValue<=4.0)
-            {
-               count++;
-            }
-        }
-
-    }
-    catch(Exception e)
-    {
-        System.out.println(e.getStackTrace());
-        Assert.assertFalse(false,"The Washing Machine search testcase is failed.");
-    }
-
-      Assert.assertTrue(true,"The Washing Machine search testcase is passed.");
-
-    }
-
+public class TestCases extends BaseTest {
 
     @Test
-    public void testCase02() throws InterruptedException{
+    public void testCase01() throws InterruptedException {
 
-        try{
+        SeleniumScrapper obj = new SeleniumScrapper();
 
-        WebElement productSearch=driver.findElement(By.xpath("//input[@class='zDPmFV']"));
-        productSearch.click();
-        Thread.sleep(2000);
-        Actions action=new Actions(driver);
-        action.keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL);
-        action.perform();
-        action.sendKeys(Keys.DELETE);
-        action.perform();
-      //  productSearch.clear();
-        Thread.sleep(3000);
-        productSearch.sendKeys("iPhone");
-        Thread.sleep(3000);
+        WebElement hockeyTeamsLink = driver.findElement(By.xpath("//a[@href='/pages/forms/']"));
 
-        WebElement searchKey=driver.findElement(By.xpath("//button[@class='MJG8Up']"));
-        searchKey.click();
-        Thread.sleep(3000);
+        obj.clickOnTheGivenWebElement(hockeyTeamsLink, driver);
 
-        List<WebElement> listOfProductsDiscounts=driver.findElements(By.xpath("//div[@class='tUxRFH']"));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3l));
+        wait.until(ExpectedConditions.urlContains("forms"));
 
-        for(WebElement parentElement : listOfProductsDiscounts)
-        {
-            WebElement productDiscount=parentElement.findElement(By.xpath(".//div[@class='UkUFwK']/span"));
-            String productDiscountText=productDiscount.getText();
-            String replace="% off";
-            String current="";
-            String exactProductDiscount=productDiscountText.replace(replace, current);
-            int productDiscountValue=Integer.parseInt(exactProductDiscount);
-            if(productDiscountValue>17)
-            {
-                WebElement productTitle=parentElement.findElement(By.xpath(".//div[@class='KzDlHZ']"));
-                System.out.println("Product title:-" + productTitle.getText() + " and discount percentage:-" + productDiscountValue);
+        WebElement submitButton = driver.findElement(By.xpath("//input[@type='submit']"));
+
+        obj.scrollToTheElement(submitButton, driver);
+
+        List<WebElement> listOfTeamNames = driver.findElements(By.xpath("//table/tbody/tr[@class='team']/td[6][text()<0.4]/parent::tr/td[1]"));
+
+        HashMap<String, List<String>> map = new HashMap<>();
+
+        List<String> teams = new ArrayList<>();
+        teams.add(listOfTeamNames.get(0).getText());
+
+        map.put("Team Name", teams);
+        int k = 0;
+
+        for (int j = 2; j < 5; j++) {
+            if (j == 2) {
+                k = 1;
+            } else {
+                k = 0;
+            }
+
+            listOfTeamNames = driver.findElements(By.xpath("//table/tbody/tr[@class='team']/td[6][text()<0.4]/parent::tr/td[1]"));
+            for (int i = k; i < listOfTeamNames.size(); i++) {
+                if (map.containsKey("Team Name")) {
+                    List<String> teams_2 = map.get("Team Name");
+                    String teamName = listOfTeamNames.get(i).getText();
+                    teams_2.add(teamName);
+                    map.put("Team Name", teams_2);
+                }
 
             }
+
+            WebElement numberLink = driver.findElement(By.xpath("//a[@href='/pages/forms/?page_num=" + j + "']"));
+            numberLink.click();
+
+            String url = "https://www.scrapethissite.com/pages/forms/?page_num=" + j;
+            wait.until(ExpectedConditions.urlToBe(url));
         }
 
+        WebElement numberLink = driver.findElement(By.xpath("//a[@href='/pages/forms/?page_num=1']"));
+        numberLink.click();
+
+        String url = "https://www.scrapethissite.com/pages/forms/?page_num=1";
+        wait.until(ExpectedConditions.urlToBe(url));
+
+        //Year
+        List<WebElement> listOfYears = driver.findElements(By.xpath("//table/tbody/tr[@class='team']/td[6][text()<0.4]/parent::tr/td[2]"));
+
+        HashMap<String, List<String>> map2 = new HashMap<>();
+
+        List<String> teams_2 = new ArrayList<>();
+        teams_2.add(listOfYears.get(0).getText());
+
+        map2.put("Year", teams_2);
+
+        k = 0;
+        for (int j = 2; j < 5; j++) {
+            if (j == 2) {
+                k = 1;
+            } else {
+                k = 0;
+            }
+
+            listOfYears = driver.findElements(By.xpath("//table/tbody/tr[@class='team']/td[6][text()<0.4]/parent::tr/td[2]"));
+            for (int i = k; i < listOfYears.size(); i++) {
+                if (map2.containsKey("Year")) {
+                    List<String> teams_3 = map2.get("Year");
+                    String teamName = listOfYears.get(i).getText();
+                    teams_3.add(teamName);
+                    map2.put("Year", teams_3);
+                }
+
+            }
+
+            numberLink = driver.findElement(By.xpath("//a[@href='/pages/forms/?page_num=" + j + "']"));
+            numberLink.click();
+
+            url = "https://www.scrapethissite.com/pages/forms/?page_num=" + j;
+            wait.until(ExpectedConditions.urlToBe(url));
+        }
+
+        numberLink = driver.findElement(By.xpath("//a[@href='/pages/forms/?page_num=1']"));
+        numberLink.click();
+
+        url = "https://www.scrapethissite.com/pages/forms/?page_num=1";
+        wait.until(ExpectedConditions.urlToBe(url));
+
+        //Win%
+        List<WebElement> listOfWinPercentage = driver.findElements(By.xpath("//table/tbody/tr[@class='team']/td[6][text()<0.4]"));
+
+        HashMap<String, List<String>> map3 = new HashMap<>();
+
+        List<String> teams_3 = new ArrayList<>();
+        teams_3.add(listOfWinPercentage.get(0).getText());
+
+        map3.put("Win %", teams_3);
+
+        k = 0;
+        for (int j = 2; j < 5; j++) {
+            if (j == 2) {
+                k = 1;
+            } else {
+                k = 0;
+            }
+
+            listOfWinPercentage = driver.findElements(By.xpath("//table/tbody/tr[@class='team']/td[6][text()<0.4]"));
+            for (int i = k; i < listOfWinPercentage.size(); i++) {
+                if (map3.containsKey("Win %")) {
+                    List<String> teams_4 = map3.get("Win %");
+                    String teamName = listOfWinPercentage.get(i).getText();
+                    teams_4.add(teamName);
+                    map3.put("Win %", teams_4);
+                }
+
+            }
+
+            numberLink = driver.findElement(By.xpath("//a[@href='/pages/forms/?page_num=" + j + "']"));
+            numberLink.click();
+
+            url = "https://www.scrapethissite.com/pages/forms/?page_num=" + j;
+            wait.until(ExpectedConditions.urlToBe(url));
+        }
+
+        numberLink = driver.findElement(By.xpath("//a[@href='/pages/forms/?page_num=1']"));
+        numberLink.click();
+
+        url = "https://www.scrapethissite.com/pages/forms/?page_num=1";
+        wait.until(ExpectedConditions.urlToBe(url));
+
+        ArrayList<HashMap<String, List<String>>> listOfMaps = new ArrayList<>();
+        listOfMaps.add(map);
+        listOfMaps.add(map2);
+        listOfMaps.add(map3);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Converting the created arraylist to a JSON payload as string
+        try {
+            String employeePrettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(listOfMaps);
+            System.out.println(employeePrettyJson);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getStackTrace());
+        }
+
+        String userDir = System.getProperty("user.dir");
+
+        try {
+            mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(new File(userDir + "\\src\\test\\resources\\hockey-team-data.json"), listOfMaps);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String fileName = "\\src\\test\\resources\\hockey-team-data.json";
+
+        Assert.assertTrue(fileName.length() > 0, "The file in the mentioned location is not present and not empty.");
+        // Assert.assertNull("\\src\\test\\resources\\hockey-team-data.json");
+
     }
 
-    catch(Exception e)
-    {
-      System.out.println(e.getStackTrace());
-      Assert.assertFalse(false,"The iPhone search testcase is failed.");
-    }
-
-    Assert.assertTrue(true,"The iPhone search testcase is passed.");
-
-    }
-
-    @SuppressWarnings("unlikely-arg-type")
     @Test
-    public void testCase03() throws InterruptedException{
+    public void testCase02() throws InterruptedException {
 
-        try{
+        WebElement oscarWinningLink = driver.findElement(By.xpath("//a[text()='Oscar Winning Films: AJAX and Javascript']"));
+        oscarWinningLink.click();
 
-        WebElement productSearch=driver.findElement(By.xpath("//input[@class='zDPmFV']"));
-        productSearch.click();
-        Thread.sleep(2000);
-        Actions action=new Actions(driver);
-        action.keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL);
-        action.perform();
-        action.sendKeys(Keys.DELETE);
-        action.perform();
-      //  productSearch.clear();
-        Thread.sleep(3000);
-        productSearch.sendKeys("Coffee Mug");
-        Thread.sleep(3000);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3l));
+        wait.until(ExpectedConditions.urlToBe("https://www.scrapethissite.com/pages/ajax-javascript/"));
 
-        WebElement searchKey=driver.findElement(By.xpath("//button[@class='MJG8Up']"));
-        searchKey.click();
-        Thread.sleep(3000);
+        List<WebElement> listOfYears = driver.findElements(By.xpath("//a[@class='year-link']"));
 
-       JavascriptExecutor jse=(JavascriptExecutor)driver;
-        
-      // WebElement oneStar=driver.findElement(By.xpath("//div[text()='1★ & above']"));
-      //  System.out.println(oneStar.getText());
-        jse.executeScript("window.scrollBy(0,350)","");
+        ArrayList<HashMap<List<String>, List<String>>> yearWiseFilmDetailsList = new ArrayList<>();
 
-        Thread.sleep(2000);
+        for (int i = 0; i < listOfYears.size(); i++) {
+            WebElement year = listOfYears.get(i);
 
-        //WebElement fourStarCheckbox=driver.findElement(By.xpath("//div[text()='4★ & above']//parent::label//div[@class='XqNaEv']"));
-       // WebElement fourStarCheckbox=driver.findElement(By.xpath("(//input[@class='vn9L2C'])[2]"));
-       WebElement fourStarCheckbox=driver.findElement(By.cssSelector("#container > div > div.nt6sNV.JxFEK3._48O0EI > div.DOjaWF.YJG4Cf > div.DOjaWF.gdgoEp.col-2-12 > div > div > div > section:nth-child(6) > div.SDsN9S > div > div:nth-child(1) > div > label > div.XqNaEv"));
-       fourStarCheckbox.click();
+            year.click();
 
-        Thread.sleep(3000);
+            // WebElement title=driver.findElement(By.xpath("//th[text()='Title']"));
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//th[text()='Title']")));
 
-        List<WebElement> reviews=driver.findElements(By.xpath("//span[@class='Wphh3N']"));
+            HashMap<List<String>, List<String>> map = new HashMap<>();
 
-        int[] reviews_2=new int[reviews.size()];
-        int index=0;
+            String yearValue = year.getText();
 
-        
-        for(WebElement element : reviews)
-        {
+            List<String> listOfHeadings = new ArrayList<>() {
+                {
+                    add("Year");
+                    add("Title");
+                    add("Nomination");
+                    add("Awards");
+                    add("isWinner");
+                }
+            };
 
-          //  System.out.println(element.getText());
-            
-           String element_2=element.getText();
-            // System.out.println(element_2);
-            if(element_2.contains(","))
-            {
-                String current=",";
-                String replace="";
-                String updated=element_2.replace(current, replace);
-                element_2=updated;
+            List<String> filmDetails = new ArrayList<>();
+
+            for (int j = 1; j <= 5; j++) {
+                filmDetails.add(yearValue);
+                for (int k = 1; k <= 4; k++) {
+                    WebElement element = driver.findElement(By.xpath("//table/tbody/tr[" + j + "]/td[" + k + "]"));
+                    if (j == 1 && k == 4) {
+                        filmDetails.add("true");
+                    } else if ((j >= 2 && j <= 5) && k == 4) {
+                        filmDetails.add("false");
+                    } else {
+                        filmDetails.add(element.getText());
+                    }
+                }
             }
-          //  System.out.println(element_2);
-             int endIndex=element_2.length()-1;
-            // System.out.println(endIndex);
-             String subStr=element_2.substring(1, endIndex);
-             int reviewCountValue=Integer.parseInt(subStr);
-             reviews_2[index]=reviewCountValue;
-             index++;
+
+            // HashMap<List<String>,List<String>> map=new HashMap<>();
+            // if (map.containsKey(listOfHeadings)) {
+            //     List<String> filmDetails_2 = map.get(listOfHeadings);
+            //     for (int s = 0; s < filmDetails.size(); s++) {
+            //         filmDetails_2.add(filmDetails.get(s));
+            //     }
+            //     map.put(listOfHeadings, filmDetails_2);
+            // } else {
+            //     map.put(listOfHeadings, filmDetails);
+            // }
+            map.put(listOfHeadings, filmDetails);
+
+            yearWiseFilmDetailsList.add(map);
 
         }
 
-    
-   
+        ObjectMapper mapper = new ObjectMapper();
 
-          Arrays.sort(reviews_2);
-
-          int updatedArray[]=new int[5];
-          int c=0,index2=0;
-
-          for(int i=reviews_2.length-1;i>=0;i--)
-          {
-               if(c==5)
-               {
-                break;
-               }
-              updatedArray[index2]=reviews_2[i];
-              index2++;
-              c++;
-
-          }
-
-          //System.out.println(updatedArray[3]+ " " +updatedArray[4]);
-
-
-
-          List<WebElement> listOfItems=driver.findElements(By.xpath("//div[@class='slAVV4']"));
-
-
-          for(WebElement parentElement : listOfItems)
-          {
-
-          //  System.out.println(parentElement.getText());
-            WebElement reviewsCount=parentElement.findElement(By.xpath(".//span[@class='Wphh3N']"));
-      
-            String element_2=reviewsCount.getText();
-
-            if(element_2.contains(","))
-            {
-                String current=",";
-                String replace="";
-                String updated=element_2.replace(current, replace);
-                element_2=updated;
-            }
-
-             String subStr=element_2.substring(1, element_2.length()-1);
-
-            
-           int reviewCountValue=Integer.parseInt(subStr);
-           //System.out.println("list element" + reviewCountValue);
-           //System.out.println(updatedArray[0] +", " + updatedArray[1] +", "+ updatedArray[2] + ", "+updatedArray[3]+ ", "+ updatedArray[4]);
-           boolean isElement=IntStream.of(updatedArray).anyMatch(x -> x == reviewCountValue);
-          //  System.out.println(isElement);
-            if(isElement==true)
-            {
-                WebElement itemTitle=parentElement.findElement(By.xpath(".//a[@class='wjcEIp']"));
-                WebElement itemImage=parentElement.findElement(By.xpath(".//img[@class='DByuf4']"));
-                System.out.println("item Title:- " + itemTitle.getText() + "itemImageUrl:- " + itemImage.getAttribute("src"));
-   
-            }
-          }
-
+        // Converting the created arraylist to a JSON payload as string
+        try {
+            String employeePrettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(yearWiseFilmDetailsList);
+            System.out.println(employeePrettyJson);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getStackTrace());
         }
 
-          catch(Exception e)
-          {
-             System.out.println(e.getStackTrace());
-             Assert.assertFalse(false,"The Coffee Mug search testcase is failed.");
-          }
+        String userDir = System.getProperty("user.dir");
 
-          Assert.assertTrue(true,"The Coffee Mug search testcase is passed.");
+        try {
+            mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(new File(userDir + "\\src\\test\\resources\\oscar-winner-data.json"), yearWiseFilmDetailsList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        
-        
-     }
+        String fileName = "\\src\\test\\resources\\oscar-winner-data.json";
 
-    
-    
+        Assert.assertTrue(fileName.length() > 0, "The file in the mentioned location is not present and not empty.");
 
+    }
 
 }
-
