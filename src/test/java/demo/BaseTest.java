@@ -14,13 +14,12 @@ import org.testng.annotations.BeforeSuite;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-public class BaseTest{
+public class BaseTest {
 
     public static ChromeDriver driver;
 
     @BeforeSuite
-    public void startBrowser()
-    {
+    public void startBrowser() {
         WebDriverManager.chromedriver().timeout(30).setup();
         ChromeOptions options = new ChromeOptions();
         LoggingPreferences logs = new LoggingPreferences();
@@ -37,27 +36,23 @@ public class BaseTest{
 
         // Set browser to maximize and wait
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30l));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5l));
     }
 
     // @BeforeTest
-    
     // public void openUrl()
     // {
     //    driver.get("https://www.flipkart.com/");
     // }
-
     @BeforeMethod
-    public void openUrl()
-    {
+    public void openUrl() {
         System.out.println("Opening the url.");
         driver.get("https://www.scrapethissite.com/pages/");
     }
 
     @AfterSuite
-    public void closeBrowser()
-    {
-       System.out.println("End Test: TestCases");
-       driver.quit();
+    public void closeBrowser() {
+        System.out.println("End Test: TestCases");
+        driver.quit();
     }
 }
